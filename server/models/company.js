@@ -8,4 +8,4 @@ let companySchema = mongoose.Schema({
     site: String
 });
 
-module.exports = mongoose.model('Company', companySchema);
+module.exports = mongoose.model('Company', companySchema, "companies");

@@ -9,7 +9,7 @@ let indexRouter = require('./routes/index');
 let usersRouter = require('./routes/users');
 let userDetail = require('./routes/userDetail');
 let configDb = require('./config/database');
-mongoose.connect(configDb.uri);
+mongoose.connect(configDb.uri, { useNewUrlParser: true });
 
 let app = express();
 

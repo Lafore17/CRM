@@ -8,7 +8,7 @@ router.post('/', function(req, res, next) {
     let userForCheck = {
         login: data.login
     };
-    console.log(userForCheck);
+    console.log(`LOGIN: ${data.login} PASSWORDHASH: ${data.password}`);
     User.findOne( userForCheck , function (err, user) {
        if (!err) {
            if (user) {
@@ -19,6 +19,7 @@ router.post('/', function(req, res, next) {
                    res.send("Login just exist");
                }
            } else {
+               userForCheck['passwordHash'] = data.password;
                let newUser = new User(userForCheck);
                newUser.save(userForCheck);
                res.send(userForCheck);

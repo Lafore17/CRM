@@ -22,7 +22,7 @@
                         <td>Почта</td>
                         <td>Лицо</td>
                         <td>Номер телефона</td>
-                        <td>Email</td>
+                        <td>Сайт</td>
                     </tr>
                 </thead>
                 <tbody>

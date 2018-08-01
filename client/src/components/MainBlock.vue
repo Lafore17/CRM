@@ -9,7 +9,7 @@
           <li @click='activeDivision'><router-link to="mainPage" class='link' active-class="active">Главная</router-link></li>
           <li @click='activeDivision'><router-link to="companies" class='link'>Компании</router-link></li>
           <li @click='activeDivision'><router-link to="events" class='link'>События</router-link></li>
-          <li @click='activeDivision'><a href='#' id='accaunt'>Аккаунт</a></li>
+          <li @click='activeDivision'><a href='#' id='accaunt'  class='link'>Аккаунт</a></li>
           <li @click='activeDivision'><router-link to="login" class='link'>Выйти</router-link></li>
         </ul>
       </div>
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-export default {
+  export default {
     name: 'MainBlock',
     data () {
       return {
@@ -53,10 +53,14 @@ export default {
         return;
       },
       activeDivision(event){
-        // event.target.classList.toggle('active');
+        let collection = document.getElementsByClassName('link');
+        for( let elem of collection ) {
+          elem.removeAttribute('style');
+        }
+        event.target.style.color = 'red';
       }
     }
-}    
+  }    
 </script>
 
 <style scoped>

@@ -1,15 +1,15 @@
 <template>
     <div class='auth' id='auth'>
-        <div class='authBlock'>
+        <form action=''>
             <div class='login'>
                 <label for="login">Login</label>
-                <input type="text" id='login' v-model='login' class='form-control'>
+                <input type="text" id='login' v-model='login' class='form-control' name='login'>
             </div>
             <div class='password'>
                 <label for="password">Password</label>
-                <input type="password" id='password' v-model='password' class='form-control'>
+                <input type="password" id='password' v-model='password' class='form-control' name='password'>
             </div>
-        </div>
+        </form>
         <input type="button" @click='submitUser' class='submit btn btn-outline-danger' value='Вход'>
     </div>
 </template>
@@ -22,7 +22,7 @@
                 login : '',
                 password : '',
                 entry : false,
-                isActiveLogin: this.activeLogin,
+                isActiveLogin : this.activeLogin,
                 isActiveMenu : this.activeMenu
             }
         },
@@ -40,13 +40,13 @@
 
 <style scoped>
 
-    .authBlock{
+    form{ 
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
     }
-    
+
     .auth{
         display: flex;
         flex-direction: column;
@@ -91,7 +91,7 @@
 
     .login{
         display: flex;
-        /* justify-content: center; */
         margin-top: 250px;
     }
+
 </style>

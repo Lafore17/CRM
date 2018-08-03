@@ -17,17 +17,13 @@ router.route('/')
     })
     .post(function (req, res) {
         let data = req.body;
-        let newEvent = new Event()
-        console.log(newEvent);
-        console.log(data);
+        let newEvent = new Event();
         newEvent.creator = req.user.login;
         newEvent.title = data.title;
         newEvent.type = data.type;
         newEvent.date = data.date;
-        console.log(newEvent.date);
         newEvent.description = data.description;
         newEvent.status = data.status;
-        console.log(newEvent);
         newEvent.save(function (err) {
             if (!err)
                 res.json({"message" : "Successfully created!"});

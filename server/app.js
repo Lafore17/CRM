@@ -35,12 +35,14 @@ let loginRouter = require('./routes/login');
 let logoutRouter = require('./routes/logout');
 let usersRouter = require('./routes/users');
 let profileRouter = require('./routes/profile');
+let eventsRouter = require('./routes/events');
 
 app.use('/', indexRouter);
 app.use('/login', loginRouter);
 app.use('/logout', isLoggedIn, logoutRouter);
 app.use('/profile', isLoggedIn, profileRouter);
 app.use('/api/db/users', isLoggedIn, usersRouter);
+app.use('/api/db/events', isLoggedIn, eventsRouter);
 
 module.exports = app;
 

@@ -38,7 +38,7 @@ let profileRouter = require('./routes/profile');
 let eventsRouter = require('./routes/events');
 let companiesRouter = require('./routes/companies');
 
-app.use('/', indexRouter);
+app.use('/', isLoggedIn, indexRouter);
 app.use('/login', loginRouter);
 app.use('/logout', isLoggedIn, logoutRouter);
 app.use('/profile', isLoggedIn, profileRouter);

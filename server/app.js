@@ -36,6 +36,7 @@ let logoutRouter = require('./routes/logout');
 let usersRouter = require('./routes/users');
 let profileRouter = require('./routes/profile');
 let eventsRouter = require('./routes/events');
+let companiesRouter = require('./routes/companies');
 
 app.use('/', indexRouter);
 app.use('/login', loginRouter);
@@ -43,6 +44,7 @@ app.use('/logout', isLoggedIn, logoutRouter);
 app.use('/profile', isLoggedIn, profileRouter);
 app.use('/api/db/users', isLoggedIn, usersRouter);
 app.use('/api/db/events', isLoggedIn, eventsRouter);
+app.use('/api/db/companies', isLoggedIn, companiesRouter);
 
 module.exports = app;
 

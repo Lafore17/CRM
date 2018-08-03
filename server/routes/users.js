@@ -9,7 +9,6 @@ router.route('/')
         let data = req.body;
         User.find({}, function (err, users) {
             if (!err) {
-                if (req.session)
                     res.send(users);
             } else {
                 res.status(500).send({ "message": "Error get list of users from database"});

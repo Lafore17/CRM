@@ -7,7 +7,7 @@ let Event = require('../models/event');
 router.route('/')
     .get( function(req, res, next) {
         let userLogin = req.user.login;
-        Event.find({ username: userLogin}, function (err, events) {
+        Event.find({ creator: userLogin}, function (err, events) {
             if (!err) {
                     res.send(events);
             } else {

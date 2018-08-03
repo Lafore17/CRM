@@ -2,7 +2,6 @@ let express = require('express');
 let router = express.Router();
 let User = require('../models/user');
 
-/* GET users listing. */
 
 router.route('/')
     .get( function(req, res, next) {
@@ -21,7 +20,9 @@ router.route('/')
         newUser.login = data.login;
         newUser.password = data.password;
         newUser.save(function (err) {
-            if (err)
+            if (!err)
+                res.json({"message" : "Successfully created!"});
+            else
                 res.status(501).send({ "message": "Cant create a new user"});
         })
     });

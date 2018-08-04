@@ -6,6 +6,7 @@ let logger = require('morgan');
 let mongoose = require('mongoose');
 let session = require('express-session');
 let passport = require('passport');
+let cors = require('cors');
 
 let configDb = require('./config/database');
 mongoose.connect(configDb.uri, { useNewUrlParser: true });
@@ -14,6 +15,7 @@ let app = express();
 
 require('./config/passport')(passport);
 
+app.options('*', cors());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({

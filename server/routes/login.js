@@ -4,9 +4,12 @@ let User = require('../models/user');
 let passport = require('passport');
 
 /* GET users listing. */
-router.post('/', passport.authenticate('local', {
-    successRedirect: '/profile',
-    failureRedirect: '/login'
-}));
+router.post('/', function (req, res) {
+    passport.authenticate('local', function (err, account) {
+        req.logIn(account, function () {
+            res.status(err ? 500 : 200).send(err ? err : account);
+        });
+    })(req, res);
+});
 
 module.exports = router;

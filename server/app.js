@@ -28,8 +28,6 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.static(path.join(__dirname, 'public')));
-
 
 let indexRouter = require('./routes/index');
 let loginRouter = require('./routes/login');
@@ -39,10 +37,8 @@ let profileRouter = require('./routes/profile');
 let eventsRouter = require('./routes/events');
 let companiesRouter = require('./routes/companies');
 
-app.use('/', isLoggedIn, indexRouter);
-app.use('/login', loginRouter);
-app.use('/logout', isLoggedIn, logoutRouter);
-app.use('/profile', isLoggedIn, profileRouter);
+app.use('/api/login', loginRouter);
+app.use('/api/logout', isLoggedIn, logoutRouter);
 app.use('/api/db/users', isLoggedIn, usersRouter);
 app.use('/api/db/events', isLoggedIn, eventsRouter);
 app.use('/api/db/companies', isLoggedIn, companiesRouter);
@@ -51,8 +47,9 @@ module.exports = app;
 
 
 function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated())
+    if (req.isAuthenticated()) {
         return next();
+    }
     res.status(400).json({
         'message': 'access denied'
     });

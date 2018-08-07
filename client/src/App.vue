@@ -1,31 +1,26 @@
 <template>
   <div id="app" class='wrapper'>
-    <router-view :name="isAuth ? 'goodAuth' : 'badAuth'"></router-view>
+    <router-view @logged='handleLog' :name="isAuth ? 'goodAuth' : 'badAuth'"></router-view>
   </div>
 </template>
-
+ 
 <script>
   export default {
     name: 'app',
     data () {
       return {
-        // currentComponent: 'login',
         isActiveMenu: false,
         isActiveLogin : true,
-        isActiveLogo: false, //!!!
-        isAuth: true
+        isActiveLogo: false,
+        isAuth: false
       }
     },
-    components:{
-      // login,
-      // Main,
-      // Login
-      // 'main-page' : mainPage,
-      // 'events-page' : eventPage,
-      // 'copmanies-page' : companiesPage,
-      // 'create-event' : createEvent
-    },
     methods:{
+      handleLog(isLogged) {
+        this.isAuth = isLogged;
+        console.log(isLogged);
+        return;
+      },
       getMainSection(entry, activeLogin, activeMenu){
         this.isActiveLogin = activeLogin;
         this.isActiveMenu = activeMenu;
@@ -34,8 +29,21 @@
       }
     },
     created(){
-      // zapros ------ > true : false;
-      // isAuth = res;
+      if( localStorage.getItem('token') ) {
+        fetch(`http://localhost:3000/api/db/users/${localStorage.getItem('token')}`, {
+          method : 'GET',
+          headers:{
+            'Accept': 'application/json',
+            'Content-Type' : 'application/json'
+          },
+          credentials: 'include'
+        })
+        .then(res => {
+          if(res) {
+            this.isAuth = true;
+          }
+        })
+      }
     }
   }
 </script>

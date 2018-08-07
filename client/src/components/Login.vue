@@ -10,6 +10,9 @@
                 <input type="password" id='password' v-model='password' class='form-control' name='password'>
             </div>
         </form>
+        <div class='loading' v-if='isLoading'>
+            <h4>Loading...</h4>
+        </div>
         <input type="button" @click='submitUser' class='submit btn btn-outline-danger' value='Вход'>
     </div>
 </template>
@@ -23,14 +26,44 @@
                 password : '',
                 entry : false,
                 isActiveLogin : this.activeLogin,
-                isActiveMenu : this.activeMenu
+                isActiveMenu : this.activeMenu,
+                isLoading: false
             }
         },
         methods:{
             submitUser(){
-                this.entry = !this.entry;
-                this.isActiveLogin = false;
-                this.isActiveMenu = true;
+                this.isLoading = true;
+                fetch('http://localhost:3000/api/login', {
+                    method : 'POST',
+                    headers:{
+                        'Accept': 'application/json',
+                        'Content-Type' : 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        login: this.login,
+                        password: this.password
+                    })
+                })
+                .then(res => res.json())
+                .then(data => { 
+                    if(data._id !== undefined){
+                        localStorage.setItem('token', data._id);
+                        this.isLoading = false;
+                        this.$emit('logged', true);
+                    }else{
+                        alert('error!');
+                        this.isLoading = false;
+                        this.$emit('logged', false);
+                    }
+                })
+                .catch(error => {
+                    this.isLoading = false;
+                    console.log(error);
+                })
+                // this.entry = !this.entry;
+                // this.isActiveLogin = false;
+                // this.isActiveMenu = true;
                 this.$emit('successfulEntry', this.entry, this.isActiveLogin, this.isActiveMenu);
                 return; 
             }

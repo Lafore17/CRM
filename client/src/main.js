@@ -14,6 +14,7 @@ Vue.use(VueRouter);
 const routes = [
     {
       path : '/',
+      props: true,
       components : {
         default: Login,
         goodAuth: MainBlock,

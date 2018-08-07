@@ -1,34 +1,37 @@
 <template>
   <div id="app" class='wrapper'>
-    <router-view @logged='handleLog' :name="isAuth ? 'goodAuth' : 'badAuth'"></router-view>
+    <router-view 
+      @logged='handleLog'
+      @receive='getCurrentEvents'
+      :name="isAuth ? 'goodAuth' : 'badAuth'"
+      :events='currentEvents'>
+    </router-view>
   </div>
 </template>
  
 <script>
   export default {
-    name: 'app',
+    name: 'App',
     data () {
       return {
-        isActiveMenu: false,
-        isActiveLogin : true,
-        isActiveLogo: false,
-        isAuth: false
+        // isActiveMenu: false,
+        // isActiveLogin : true,
+        // isActiveLogo: false,
+        isAuth: false,
+        currentEvents : ''
       }
     },
-    methods:{
+    methods: {
       handleLog(isLogged) {
         this.isAuth = isLogged;
-        console.log(isLogged);
         return;
       },
-      getMainSection(entry, activeLogin, activeMenu){
-        this.isActiveLogin = activeLogin;
-        this.isActiveMenu = activeMenu;
-        this.currentComponent = 'main-page';
+      getCurrentEvents(arrayOfEvent){
+        this.currentEvents = arrayOfEvent;
         return;
       }
     },
-    created(){
+    created() {
       if( localStorage.getItem('token') ) {
         fetch(`http://localhost:3000/api/db/users/${localStorage.getItem('token')}`, {
           method : 'GET',

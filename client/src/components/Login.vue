@@ -20,18 +20,19 @@
     import axios from 'axios';
     export default {
         props:['activeLogin', 'activeMenu'],
-        data(){
-            return{
+        data() {
+            return {
                 login : '',
                 password : '',
                 entry : false,
                 isActiveLogin : this.activeLogin,
                 isActiveMenu : this.activeMenu,
-                isLoading: false
+                isLoading: false,
+                collection_events: []
             }
         },
-        methods:{
-            submitUser(){
+        methods: {
+            submitUser() {
                 this.isLoading = true;
                 fetch('http://localhost:3000/api/login', {
                     method : 'POST',
@@ -49,21 +50,35 @@
                 .then(data => { 
                     if(data._id !== undefined){
                         localStorage.setItem('token', data._id);
-                        this.isLoading = false;
-                        this.$emit('logged', true);
                     }else{
                         alert('error!');
                         this.isLoading = false;
                         this.$emit('logged', false);
                     }
                 })
+                .then(() => {
+                    fetch('http://localhost:3000/api/db/events', {
+                        method : 'GET',
+                        credentials: 'include'
+                    })
+                })
+                .then(res => {
+                    if( res ){
+                        res.json();
+                    }else{
+                        return;
+                    }
+                })
+                .then(data => {
+                    this.isLoading = false;
+                    this.$emit('logged', true);
+                    console.log(JSON.parse(data))
+                    this.$emit('receiveEvents', JSON.parse(data));
+                })
                 .catch(error => {
                     this.isLoading = false;
                     console.log(error);
                 })
-                // this.entry = !this.entry;
-                // this.isActiveLogin = false;
-                // this.isActiveMenu = true;
                 this.$emit('successfulEntry', this.entry, this.isActiveLogin, this.isActiveMenu);
                 return; 
             }

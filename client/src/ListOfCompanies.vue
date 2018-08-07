@@ -6,8 +6,8 @@
                     type="button" 
                     value='Создать компанию' 
                     class='btn btn-danger' 
-                    id='add_company' 
-                    @click='isActiveModal = true'>
+                    id='add_company'
+                    @click='createCompany'>
                 <form class='control'>
                     <input 
                         type="text" 
@@ -65,27 +65,28 @@
                 <form>
                     <div>
                         <label for="title_of_company">Name of Company</label>
-                        <input type="text" id='title_of_company'>
+                        <input type="text" id='title_of_company' v-model='name_of_company'>
                     </div>
                     <div> 
                         <label for="Site">Site</label>
-                        <input type="text" id='site'>
+                        <input type="text" id='site' v-model='site'>
                     </div>
                     <div>
                         <label for="Contact person">Contact person</label>
-                        <input type="text" id='contact_person'>
+                        <input type="text" id='contact_person' v-model='contact_person'>
                     </div>
                     <div>
                         <label for="Phone number">Phone number</label>
-                        <input type="text" id='phone_number'>
+                        <input type="text" id='phone_number' v-model='phone'>
                     </div>
                     <div>
                         <label for="email">Email</label>
-                        <input type="email" id='email'>
+                        <input type="email" id='email' v-model='email'>
                     </div>
                 </form>
+                <h4 v-if='isActiveCreatingCompany'>Создание...</h4>
                 <div class='submit_info_of_company'>
-                    <input type="button" value='Submit' class='btn btn-danger' id='submit'>
+                    <input type="button" value='Submit' class='btn btn-danger' id='submit' @click='postCompany'>
                 </div>
             </div>
         </div>
@@ -93,8 +94,17 @@
             <div class='content_of_modal_events'>
                 <span class="close" @click='isActiveModalEvents = false'>&times;</span>
                 <div class='searcher_with_btn'>
-                    <input type="button" value='Cоздать событие'  class='btn btn-danger' id='addEvents'>
-                    <input type="text" placeholder='Поиск по дате' id='search_with_date' class='searchDate'>
+                    <input 
+                        type="button" 
+                        value='Cоздать событие' 
+                        class='btn btn-danger' 
+                        id='addEvents' 
+                        @click='create_event'>
+                    <input 
+                        type="text" 
+                        placeholder='Поиск по дате' 
+                        id='search_with_date' 
+                        class='searchDate'>
                 </div>
                 <table>
                     <thead>
@@ -136,6 +146,9 @@
             current:{
                 type: Number,
                 default: 1
+            },
+            arrayEvents:{
+
             }
         },
         computed:{
@@ -150,6 +163,12 @@
             return{
                 isActiveModal : false,
                 isActiveModalEvents: false,
+                name_of_company: '',
+                email: '',
+                contact_person: '',
+                phone: '',
+                site: '',
+                isActiveCreatingCompany: false,
                 mama:[
                     {
                         name: 'Dima',
@@ -213,6 +232,40 @@
             },
             getEvents(){
                 this.isActiveModalEvents = true;
+                return;
+            },
+            createCompany(){
+                this.isActiveModal = true;
+                
+                return;
+            },
+            create_event(){
+                this.$router.push('create_event');
+                return;
+            },
+            postCompany(){
+                this.isActiveCreatingCompany = true;
+                fetch('http://localhost:3000/api/db/companies', {
+                    method : 'POST',
+                    headers:{
+                        'Accept': 'application/json',
+                        'Content-Type' : 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        name_of_company: this.login,
+                        site: this.password,
+                        contact_person: this.contact_person,
+                        phone: this.phone,
+                        email: this.email
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    this.isActiveCreatingCompany = false;
+                    console.log(JSON.stringify(data));
+                })
+                .catch(error => console.log(error))
                 return;
             }
         }

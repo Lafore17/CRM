@@ -13,45 +13,25 @@
           <li @click='activeDivision'><router-link to="login" class='link'>Выйти</router-link></li>
         </ul>
       </div>
-        <!-- <div class='section'>
-            <component :is="'login'" 
-            :activeLogin='isActiveLogin' 
-            :activeMenu='isActiveMenu' 
-            @successfulEntry='getMainSection'>
-        </component> -->
-        <!-- </div> -->
     </div>
-    <router-view></router-view>
+    <router-view 
+      :arrayEvents='events'>
+    </router-view>
   </div>
 </template>
 
 <script>
   export default {
     name: 'MainBlock',
+    props:['events'],
     data () {
       return {
         currentComponent: 'login',
         isActiveMenu: true,
-        isActiveLogin : true,
         isActiveLogo: false //!!!
       }
     },
-    components:{
-      // login,
-      // Main,
-      // Login
-      // 'main-page' : mainPage,
-      // 'events-page' : eventPage,
-      // 'copmanies-page' : companiesPage,
-      // 'create-event' : createEvent
-    },
     methods:{
-      getMainSection(entry, activeLogin, activeMenu){
-        this.isActiveLogin = activeLogin;
-        this.isActiveMenu = activeMenu;
-        this.currentComponent = 'main-page';
-        return;
-      },
       activeDivision(event){
         let collection = document.getElementsByClassName('link');
         for( let elem of collection ) {

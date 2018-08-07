@@ -1,4 +1,5 @@
 let LocalStrategy = require('passport-local').Strategy;
+let crypto = require('crypto');
 
 let User = require('../../models/user');
 
@@ -19,8 +20,6 @@ let myLocalConfig = (passport) => {
         usernameField: 'login',
         passwordField: 'password'
     },function (username, password, done) {
-        console.log("LOGIN:", username);
-        console.log("Password:", password);
         process.nextTick(function () {
             User.findOne({ login: username}, function (err, user) {
                 if (err)
@@ -28,7 +27,7 @@ let myLocalConfig = (passport) => {
                 if (!user) {
                     let newUser = new User();
                     newUser.login = username;
-                    newUser.password = password;
+                    newUser.password = crypto.createHash('md5').update(password).digest('hex');
                     newUser.save(function (err) {
                         if (err)
                             return done(err);

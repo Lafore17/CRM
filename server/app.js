@@ -9,13 +9,16 @@ let passport = require('passport');
 let cors = require('cors');
 
 let configDb = require('./config/database');
+let appConfig = require('./config/config');
 mongoose.connect(configDb.uri, { useNewUrlParser: true });
 
 let app = express();
 
 require('./config/passport')(passport);
 
-app.use(cors());
+app.use(cors({
+    credentials: true,
+    origin: appConfig.corsOrigin}));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({

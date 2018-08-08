@@ -1,5 +1,8 @@
 <template>
     <div class='auth' id='auth'>
+        <div class='logo' v-if='isActiveLogo'>
+            <h4>DenisCRM</h4>
+        </div>
         <form action=''>
             <div class='login'>
                 <label for="login">Login</label>
@@ -28,7 +31,8 @@
                 isActiveLogin : this.activeLogin,
                 isActiveMenu : this.activeMenu,
                 isLoading: false,
-                collection_events: []
+                collection_events: [],
+                isActiveLogo: true,
             }
         },
         methods: {
@@ -125,4 +129,16 @@
         margin-top: 250px;
     }
 
+    .logo{
+        font-size: 25px;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        padding-top: 35px;
+        padding-left: 30px;
+        height: 90px;
+        width: 100%;
+        padding-bottom: 30px;
+        color: rgb(218, 113, 113);
+        background-color: rgb(138, 83, 83);
+        position: fixed;
+    }
 </style>

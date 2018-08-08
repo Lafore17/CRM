@@ -2,11 +2,7 @@
   <div id="app" class='wrapper'>
     <router-view 
       @logged='handleLog'
-      @receiveEv='getCurrentEvents'
-      @receiveComp='getCurrentCompanies'
-      :name="isAuth||flag ? 'goodAuth' : 'badAuth'"
-      :events='currentEvents'
-      :companies='currentCompanies'>
+      :name="isAuth||flag ? 'goodAuth' : 'badAuth'">
     </router-view>
   </div>
 </template>
@@ -18,7 +14,7 @@
       return {
         isAuth: false,
         currentEvents : '',
-        currentCompanies : ''
+        currentCompanies : '',
       }
     },
     methods: {
@@ -26,17 +22,16 @@
         this.isAuth = isLogged;
         return;
       },
-      getCurrentEvents(arrayOfEvent){
+      getCurrentEvents(arrayOfEvent) {
         this.currentEvents = arrayOfEvent;
         return;
       },
-      getCurrentCompanies(arrayOfCompanies){
+      getCurrentCompanies(arrayOfCompanies) {
         this.currentCompanies = arrayOfCompanies;
         return;
       }
     },
     created() {
-      console.log(this.flag)
       if( localStorage.getItem('token') ) {
         fetch(`http://localhost:3000/api/db/users/${localStorage.getItem('token')}`, {
           method : 'GET',
@@ -50,16 +45,16 @@
         })
         .then(data => {
           if(data) {
-            console.log(JSON.stringify(data))
+            console.log(data);
           }
         })
         .catch(error => console.log(error))
       }
     },
-    beforeCreate() { //как по-другому решить эту проблему
+    beforeCreate() { //как по-другому решить эту проблему???
       if(localStorage.getItem('token')) {
         this.flag = true;
-      }else{
+      }else {
         this.flag = false;
       }
     },

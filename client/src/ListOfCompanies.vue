@@ -25,7 +25,6 @@
                         <td>Лицо</td>
                         <td>Номер телефона</td>
                         <td>Сайт</td>
-                        <!-- <p>{{array_of_companies}}</p> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -119,7 +118,7 @@
                             <td>Итог</td>
                         </tr>
                     </thead>
-                    <tbody>
+                    <!-- <tbody>
                         <tr v-for='(pap, index) in papa' :key="index">
                             <td>{{pap.name}}</td>
                             <td>{{pap.type}}</td>
@@ -127,7 +126,7 @@
                             <td>{{pap.date}}</td>
                             <td>{{pap.conclusion}}</td>
                         </tr>
-                    </tbody>
+                    </tbody> -->
                 </table>
                 <div class='pagination_events'>
                     <div class='pagination_events_left'>
@@ -152,9 +151,6 @@
             prevPage() {
                 return this.current - 1;        
             }
-            // allCompanies(){
-            //     return JSON.parse(this.companies);
-            // }
         },
         data() {
             return {
@@ -166,19 +162,9 @@
                 phone: '',
                 site: '',
                 isActiveCreatingCompany: false,
-                // companies: this.arrayCompanies,
                 creatingCompany: '',
                 waiting: false,
-                array_of_companies: '',
-                mama:[
-                    {
-                        name: 'Dima',
-                        id: 1,
-                        goal: 'win',
-                        asd : 'sad',
-                        qwe : 'asdasd'
-                    }
-                ]
+                array_of_companies: ''
             }
         },
         methods: {
@@ -246,7 +232,12 @@
                     this.array_of_companies = data;  
                 })
                 .catch(error => console.log(error))
-                return;
+
+                this.name_of_company = '';
+                this.contact_person = '';
+                this.phone = '';
+                this.site = '';
+                this.email = '';
             }
         },
         created(){
@@ -256,10 +247,9 @@
                 credentials: 'include'
             })
             .then(res => {
-                console.log(res);
-                if( res ){      
+                if( res ) {      
                     return res.json();
-                }else{
+                }else {
                     return '';
                 }
             })

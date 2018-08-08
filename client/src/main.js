@@ -23,11 +23,13 @@ const routes = [
       children: [
         {
           path: 'companies',
-          component: companiesPage
+          component: companiesPage,
+          props: true,
         },
         {
           path: 'mainPage',
-          component: mainPage
+          component: mainPage,
+          props: true,
         },
         {
           path: 'events',

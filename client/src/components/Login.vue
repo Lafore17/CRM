@@ -49,31 +49,14 @@
                 .then(res => res.json())
                 .then(data => { 
                     if(data._id !== undefined){
+                        this.isLoading = false;
                         localStorage.setItem('token', data._id);
+                        this.$emit('logged', true);
                     }else{
                         alert('error!');
                         this.isLoading = false;
                         this.$emit('logged', false);
                     }
-                })
-                .then(() => {
-                    fetch('http://localhost:3000/api/db/events', {
-                        method : 'GET',
-                        credentials: 'include'
-                    })
-                })
-                .then(res => {
-                    if( res ){
-                        res.json();
-                    }else{
-                        return;
-                    }
-                })
-                .then(data => {
-                    this.isLoading = false;
-                    this.$emit('logged', true);
-                    console.log(JSON.parse(data))
-                    this.$emit('receiveEvents', JSON.parse(data));
                 })
                 .catch(error => {
                     this.isLoading = false;

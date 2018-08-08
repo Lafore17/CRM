@@ -1,5 +1,6 @@
 <template>
     <div class='wrapper'>
+        <h3 v-if='waiting' class='waitingTitle'>Подождите...</h3>
         <div class='table_of_companies'>
             <div class='button_with_searcher'>
                 <input 
@@ -15,6 +16,7 @@
                         class='form-control'>
                 </form>
             </div>
+            
             <table>
                 <thead>
                     <tr>
@@ -23,15 +25,16 @@
                         <td>Лицо</td>
                         <td>Номер телефона</td>
                         <td>Сайт</td>
+                        <!-- <p>{{array_of_companies}}</p> -->
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for='(par, index) in mama' :key="index">
+                    <tr v-for='(par, index) in array_of_companies' :key="index">
                         <td>{{par.name}}</td>
-                        <td>{{par.id}}</td>
-                        <td>{{par.goal}}</td>
-                        <td>{{par.asd}}</td>
-                        <td>{{par.qwe}}</td>
+                        <!-- <td>{{par.email}}</td> -->
+                        <td>{{par.contact}}</td>
+                        <td>{{par.phone}}</td>
+                        <td>{{par.site}}</td>
                         <div class='btns'>
                             <input 
                                 type="button" 
@@ -142,25 +145,19 @@
 <script>
 //пагинация для таблицы компаний и для ивентов. функцию одну и ту же оставить?
     export default {
-        props:{
-            current:{
-                type: Number,
-                default: 1
-            },
-            arrayEvents:{
-
-            }
-        },
-        computed:{
-            nextPage(){
+        computed: {
+            nextPage() {
                 return this.current + 1;
             },
-            prevPage(){
+            prevPage() {
                 return this.current - 1;        
             }
+            // allCompanies(){
+            //     return JSON.parse(this.companies);
+            // }
         },
-        data(){
-            return{
+        data() {
+            return {
                 isActiveModal : false,
                 isActiveModalEvents: false,
                 name_of_company: '',
@@ -169,6 +166,10 @@
                 phone: '',
                 site: '',
                 isActiveCreatingCompany: false,
+                // companies: this.arrayCompanies,
+                creatingCompany: '',
+                waiting: false,
+                array_of_companies: '',
                 mama:[
                     {
                         name: 'Dima',
@@ -176,74 +177,45 @@
                         goal: 'win',
                         asd : 'sad',
                         qwe : 'asdasd'
-                    },
-                    {
-                        name: 'Anna',
-                        id: 2,
-                        goal: 'lose',
-                        asd : 'sad',
-                        qwe : 'asdasd'
-                    },
-                    {
-                        name: 'Anna',
-                        id: 2,
-                        goal: 'lose',
-                        asd : 'sad',
-                        qwe : 'asdasd'
-                    }
-                ],
-                papa:[
-                    {
-                        name: 'Dima',
-                        type: 1,
-                        descr: 'win',
-                        date : 'sad',
-                        conclusion : 'asdasd'
-                    },
-                    {
-                        name: 'Anna',
-                        type: 1,
-                        descr: 'win',
-                        date : 'sad',
-                        conclusion : 'asdasd'
                     }
                 ]
             }
         },
-        methods:{
-            // changePage(page){ // pagination
-            //     this.$emit('page-changed', page)
-            // }
-            cancelModal(){
+        methods: {
+            changePage(){ // pagination argument "page"
+                this.$emit('page-changed', page)
+                // console.log(this.arrayCompanies);
+            },
+            cancelModal() {
                 if (event.target == document.getElementById('modal')) {
                     this.isActiveModal = false;
                 }
                 return;
             },
-            updateCompany(){
+            updateCompany() {
                 this.isActiveModal = true;
                 return;
             },
-            cancelModalEvents(){
+            cancelModalEvents() {
                 if (event.target == document.getElementById('modalEvents')) {
                     this.isActiveModalEvents = false;
                 }
                 return;
             },
-            getEvents(){
+            getEvents() {
                 this.isActiveModalEvents = true;
                 return;
             },
-            createCompany(){
+            createCompany() {
                 this.isActiveModal = true;
                 
                 return;
             },
-            create_event(){
+            create_event() {
                 this.$router.push('create_event');
                 return;
             },
-            postCompany(){
+            postCompany() {
                 this.isActiveCreatingCompany = true;
                 fetch('http://localhost:3000/api/db/companies', {
                     method : 'POST',
@@ -253,21 +225,50 @@
                     },
                     credentials: 'include',
                     body: JSON.stringify({
-                        name_of_company: this.login,
-                        site: this.password,
-                        contact_person: this.contact_person,
+                        name: this.name_of_company,
+                        contact: this.contact_person,
                         phone: this.phone,
-                        email: this.email
+                        site: this.site
+                        //email
+                    }),
+                })
+                .then(() => {
+                    this.isActiveCreatingCompany = false;
+                })
+                .then(() => {
+                    return fetch('http://localhost:3000/api/db/companies',{
+                        method : 'GET',
+                        credentials: 'include',
                     })
                 })
                 .then(res => res.json())
                 .then(data => {
-                    this.isActiveCreatingCompany = false;
-                    console.log(JSON.stringify(data));
+                    this.array_of_companies = data;  
                 })
                 .catch(error => console.log(error))
                 return;
             }
+        },
+        created(){
+            this.waiting = true;
+            fetch('http://localhost:3000/api/db/companies', {
+                method : 'GET',
+                credentials: 'include'
+            })
+            .then(res => {
+                console.log(res);
+                if( res ){      
+                    return res.json();
+                }else{
+                    return '';
+                }
+            })
+            .then(data => {
+                this.$emit('logged', true);
+                this.waiting = false;
+                this.array_of_companies = data;
+                console.log(this.array_of_companies);
+            })
         }
     }
 </script>
@@ -431,6 +432,12 @@
         display: flex;
         justify-content: space-between;
         flex-direction: row;
+    }
+
+    .waitingTitle{
+        padding-left: 150px;
+        color: coral;
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     }
 
 </style>

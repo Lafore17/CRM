@@ -6,7 +6,7 @@
     <div class='mainSection'>
       <div class='menu' v-if='isActiveMenu'>
         <ul>
-          <li @click='activeDivision'><router-link to="mainPage" class='link' active-class="active">Главная</router-link></li>
+          <li @click='activeDivision'><router-link to="mainPage" class='link'>Главная</router-link></li>
           <li @click='activeDivision'><router-link to="companies" class='link'>Компании</router-link></li>
           <li @click='activeDivision'><router-link to="events" class='link'>События</router-link></li>
           <li @click='activeDivision'><a href='#' id='accaunt'  class='link'>Аккаунт</a></li>
@@ -28,7 +28,7 @@
       return {
         currentComponent: 'login',
         isActiveMenu: true,
-        isActiveLogo: false //!!!
+        isActiveLogo: false,
       }
     },
     methods:{
@@ -38,7 +38,29 @@
           elem.removeAttribute('style');
         }
         event.target.style.color = 'red';
+        return;
       }
+    },
+    created(){
+      fetch('http://localhost:3000/api/db/events', {
+        method : 'GET',
+        credentials: 'include'
+      })
+      .then(res => {
+        // console.log(res);
+        if( res ){
+          return res.json();
+        }else{
+          return '';
+        }
+      })
+      .then(data => {
+        // this.isLoading = false;
+        // this.$emit('logged', true);
+        console.log('events - ' + JSON.stringify(data))
+        // this.$emit('receiveEv', JSON.stringify(data));
+      })
+      
     }
   }    
 </script>
@@ -115,6 +137,7 @@
     color: white;
   }
 
+  
   /* .menu a:focus {
     background: rgb(209, 174, 184);
     color: red;

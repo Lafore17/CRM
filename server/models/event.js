@@ -5,6 +5,7 @@ let eventSchema = mongoose.Schema({
     title: String,
     type: String,
     date: Date,
+    company: String,
     description: String,
     status: String
 });

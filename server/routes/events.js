@@ -22,6 +22,7 @@ router.route('/')
         newEvent.title = data.title;
         newEvent.type = data.type;
         newEvent.date = data.date;
+        newEvent.company = data.company;
         newEvent.description = data.description;
         newEvent.status = data.status;
         newEvent.save(function (err) {

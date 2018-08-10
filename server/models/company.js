@@ -5,6 +5,7 @@ let companySchema = mongoose.Schema({
     creator: String,
     name: String,
     contact: String,
+    email: String,
     phone: String,
     site: String
 });

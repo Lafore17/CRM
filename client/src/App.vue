@@ -1,42 +1,63 @@
 <template>
   <div id="app" class='wrapper'>
-    <router-view :name="isAuth ? 'goodAuth' : 'badAuth'"></router-view>
+    <router-view 
+      @logged='handleLog'
+      :name="isAuth||flag ? 'goodAuth' : 'badAuth'">
+    </router-view>
   </div>
 </template>
-
+ 
 <script>
   export default {
-    name: 'app',
+    name: 'App',
     data () {
       return {
-        // currentComponent: 'login',
-        isActiveMenu: false,
-        isActiveLogin : true,
-        isActiveLogo: false, //!!!
-        isAuth: true
+        isAuth: false,
+        currentEvents : '',
+        currentCompanies : '',
       }
     },
-    components:{
-      // login,
-      // Main,
-      // Login
-      // 'main-page' : mainPage,
-      // 'events-page' : eventPage,
-      // 'copmanies-page' : companiesPage,
-      // 'create-event' : createEvent
-    },
-    methods:{
-      getMainSection(entry, activeLogin, activeMenu){
-        this.isActiveLogin = activeLogin;
-        this.isActiveMenu = activeMenu;
-        this.currentComponent = 'main-page';
+    methods: {
+      handleLog(isLogged) {
+        this.isAuth = isLogged;
+        return;
+      },
+      getCurrentEvents(arrayOfEvent) {
+        this.currentEvents = arrayOfEvent;
+        return;
+      },
+      getCurrentCompanies(arrayOfCompanies) {
+        this.currentCompanies = arrayOfCompanies;
         return;
       }
     },
-    created(){
-      // zapros ------ > true : false;
-      // isAuth = res;
-    }
+    created() {
+      if( localStorage.getItem('token') ) {
+        fetch(`http://localhost:3000/api/db/users/${localStorage.getItem('token')}`, {
+          method : 'GET',
+          credentials: 'include'
+        })
+        .then(res => {
+          if(res) {
+            this.isAuth = true;
+            return res.json();
+          }
+        })
+        .then(data => {
+          if(data) {
+            console.log(data);
+          }
+        })
+        .catch(error => console.log(error))
+      }
+    },
+    beforeCreate() { //как по-другому решить эту проблему???
+      if(localStorage.getItem('token')) {
+        this.flag = true;
+      }else {
+        this.flag = false;
+      }
+    },
   }
 </script>
 

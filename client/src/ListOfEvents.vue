@@ -65,7 +65,6 @@
     }
 
     .main_page{
-        border: 1px solid black;
         width: 80%;
         height: 25%;
     }

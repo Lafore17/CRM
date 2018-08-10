@@ -1,13 +1,14 @@
 <template>
     <div class='wrapper'>
+        <h3 v-if='waiting' class='waitingTitle'>Подождите...</h3>
         <div class='table_of_companies'>
             <div class='button_with_searcher'>
                 <input 
                     type="button" 
                     value='Создать компанию' 
                     class='btn btn-danger' 
-                    id='add_company' 
-                    @click='isActiveModal = true'>
+                    id='add_company'
+                    @click='createCompany'>
                 <form class='control'>
                     <input 
                         type="text" 
@@ -15,6 +16,7 @@
                         class='form-control'>
                 </form>
             </div>
+            
             <table>
                 <thead>
                     <tr>
@@ -26,12 +28,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for='(par, index) in mama' :key="index">
+                    <tr v-for='(par, index) in array_of_companies' :key="index">
                         <td>{{par.name}}</td>
-                        <td>{{par.id}}</td>
-                        <td>{{par.goal}}</td>
-                        <td>{{par.asd}}</td>
-                        <td>{{par.qwe}}</td>
+                        <!-- <td>{{par.email}}</td> -->
+                        <td>{{par.contact}}</td>
+                        <td>{{par.phone}}</td>
+                        <td>{{par.site}}</td>
                         <div class='btns'>
                             <input 
                                 type="button" 
@@ -65,27 +67,28 @@
                 <form>
                     <div>
                         <label for="title_of_company">Name of Company</label>
-                        <input type="text" id='title_of_company'>
+                        <input type="text" id='title_of_company' v-model='name_of_company'>
                     </div>
                     <div> 
                         <label for="Site">Site</label>
-                        <input type="text" id='site'>
+                        <input type="text" id='site' v-model='site'>
                     </div>
                     <div>
                         <label for="Contact person">Contact person</label>
-                        <input type="text" id='contact_person'>
+                        <input type="text" id='contact_person' v-model='contact_person'>
                     </div>
                     <div>
                         <label for="Phone number">Phone number</label>
-                        <input type="text" id='phone_number'>
+                        <input type="text" id='phone_number' v-model='phone'>
                     </div>
                     <div>
                         <label for="email">Email</label>
-                        <input type="email" id='email'>
+                        <input type="email" id='email' v-model='email'>
                     </div>
                 </form>
+                <h4 v-if='isActiveCreatingCompany'>Создание...</h4>
                 <div class='submit_info_of_company'>
-                    <input type="button" value='Submit' class='btn btn-danger' id='submit'>
+                    <input type="button" value='Submit' class='btn btn-danger' id='submit' @click='postCompany'>
                 </div>
             </div>
         </div>
@@ -93,8 +96,17 @@
             <div class='content_of_modal_events'>
                 <span class="close" @click='isActiveModalEvents = false'>&times;</span>
                 <div class='searcher_with_btn'>
-                    <input type="button" value='Cоздать событие'  class='btn btn-danger' id='addEvents'>
-                    <input type="text" placeholder='Поиск по дате' id='search_with_date' class='searchDate'>
+                    <input 
+                        type="button" 
+                        value='Cоздать событие' 
+                        class='btn btn-danger' 
+                        id='addEvents' 
+                        @click='create_event'>
+                    <input 
+                        type="text" 
+                        placeholder='Поиск по дате' 
+                        id='search_with_date' 
+                        class='searchDate'>
                 </div>
                 <table>
                     <thead>
@@ -106,7 +118,7 @@
                             <td>Итог</td>
                         </tr>
                     </thead>
-                    <tbody>
+                    <!-- <tbody>
                         <tr v-for='(pap, index) in papa' :key="index">
                             <td>{{pap.name}}</td>
                             <td>{{pap.type}}</td>
@@ -114,7 +126,7 @@
                             <td>{{pap.date}}</td>
                             <td>{{pap.conclusion}}</td>
                         </tr>
-                    </tbody>
+                    </tbody> -->
                 </table>
                 <div class='pagination_events'>
                     <div class='pagination_events_left'>
@@ -132,89 +144,121 @@
 <script>
 //пагинация для таблицы компаний и для ивентов. функцию одну и ту же оставить?
     export default {
-        props:{
-            current:{
-                type: Number,
-                default: 1
-            }
-        },
-        computed:{
-            nextPage(){
+        computed: {
+            nextPage() {
                 return this.current + 1;
             },
-            prevPage(){
+            prevPage() {
                 return this.current - 1;        
             }
         },
-        data(){
-            return{
+        data() {
+            return {
                 isActiveModal : false,
                 isActiveModalEvents: false,
-                mama:[
-                    {
-                        name: 'Dima',
-                        id: 1,
-                        goal: 'win',
-                        asd : 'sad',
-                        qwe : 'asdasd'
-                    },
-                    {
-                        name: 'Anna',
-                        id: 2,
-                        goal: 'lose',
-                        asd : 'sad',
-                        qwe : 'asdasd'
-                    },
-                    {
-                        name: 'Anna',
-                        id: 2,
-                        goal: 'lose',
-                        asd : 'sad',
-                        qwe : 'asdasd'
-                    }
-                ],
-                papa:[
-                    {
-                        name: 'Dima',
-                        type: 1,
-                        descr: 'win',
-                        date : 'sad',
-                        conclusion : 'asdasd'
-                    },
-                    {
-                        name: 'Anna',
-                        type: 1,
-                        descr: 'win',
-                        date : 'sad',
-                        conclusion : 'asdasd'
-                    }
-                ]
+                name_of_company: '',
+                email: '',
+                contact_person: '',
+                phone: '',
+                site: '',
+                isActiveCreatingCompany: false,
+                creatingCompany: '',
+                waiting: false,
+                array_of_companies: ''
             }
         },
-        methods:{
-            // changePage(page){ // pagination
-            //     this.$emit('page-changed', page)
-            // }
-            cancelModal(){
+        methods: {
+            changePage(){ // pagination argument "page"
+                this.$emit('page-changed', page)
+                // console.log(this.arrayCompanies);
+            },
+            cancelModal() {
                 if (event.target == document.getElementById('modal')) {
                     this.isActiveModal = false;
                 }
                 return;
             },
-            updateCompany(){
+            updateCompany() {
                 this.isActiveModal = true;
                 return;
             },
-            cancelModalEvents(){
+            cancelModalEvents() {
                 if (event.target == document.getElementById('modalEvents')) {
                     this.isActiveModalEvents = false;
                 }
                 return;
             },
-            getEvents(){
+            getEvents() {
                 this.isActiveModalEvents = true;
                 return;
+            },
+            createCompany() {
+                this.isActiveModal = true;
+                
+                return;
+            },
+            create_event() {
+                this.$router.push('create_event');
+                return;
+            },
+            postCompany() {
+                this.isActiveCreatingCompany = true;
+                fetch('http://localhost:3000/api/db/companies', {
+                    method : 'POST',
+                    headers:{
+                        'Accept': 'application/json',
+                        'Content-Type' : 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        name: this.name_of_company,
+                        contact: this.contact_person,
+                        phone: this.phone,
+                        site: this.site
+                        //email
+                    }),
+                })
+                .then(() => {
+                    this.isActiveCreatingCompany = false;
+                })
+                .then(() => {
+                    return fetch('http://localhost:3000/api/db/companies',{
+                        method : 'GET',
+                        credentials: 'include',
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    this.array_of_companies = data;  
+                })
+                .catch(error => console.log(error))
+
+                this.name_of_company = '';
+                this.contact_person = '';
+                this.phone = '';
+                this.site = '';
+                this.email = '';
             }
+        },
+        created(){
+            this.waiting = true;
+            fetch('http://localhost:3000/api/db/companies', {
+                method : 'GET',
+                credentials: 'include'
+            })
+            .then(res => {
+                if( res ) {      
+                    return res.json();
+                }else {
+                    return '';
+                }
+            })
+            .then(data => {
+                this.$emit('logged', true);
+                this.waiting = false;
+                this.array_of_companies = data;
+                console.log(this.array_of_companies);
+            })
         }
     }
 </script>
@@ -378,6 +422,12 @@
         display: flex;
         justify-content: space-between;
         flex-direction: row;
+    }
+
+    .waitingTitle{
+        padding-left: 150px;
+        color: coral;
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     }
 
 </style>

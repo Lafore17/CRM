@@ -1,5 +1,8 @@
 <template>
     <div class='auth' id='auth'>
+        <div class='logo' v-if='isActiveLogo'>
+            <h4>DenisCRM</h4>
+        </div>
         <form action=''>
             <div class='login'>
                 <label for="login">Login</label>
@@ -10,6 +13,9 @@
                 <input type="password" id='password' v-model='password' class='form-control' name='password'>
             </div>
         </form>
+        <div class='loading' v-if='isLoading'>
+            <h4>Loading...</h4>
+        </div>
         <input type="button" @click='submitUser' class='submit btn btn-outline-danger' value='Вход'>
     </div>
 </template>
@@ -17,20 +23,49 @@
     import axios from 'axios';
     export default {
         props:['activeLogin', 'activeMenu'],
-        data(){
-            return{
+        data() {
+            return {
                 login : '',
                 password : '',
                 entry : false,
                 isActiveLogin : this.activeLogin,
-                isActiveMenu : this.activeMenu
+                isActiveMenu : this.activeMenu,
+                isLoading: false,
+                collection_events: [],
+                isActiveLogo: true,
             }
         },
-        methods:{
-            submitUser(){
-                this.entry = !this.entry;
-                this.isActiveLogin = false;
-                this.isActiveMenu = true;
+        methods: {
+            submitUser() {
+                this.isLoading = true;
+                fetch('http://localhost:3000/api/login', {
+                    method : 'POST',
+                    headers:{
+                        'Accept': 'application/json',
+                        'Content-Type' : 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        login: this.login,
+                        password: this.password
+                    })
+                })
+                .then(res => res.json())
+                .then(data => { 
+                    if(data._id !== undefined){
+                        this.isLoading = false;
+                        localStorage.setItem('token', data._id);
+                        this.$emit('logged', true);
+                    }else{
+                        alert('error!');
+                        this.isLoading = false;
+                        this.$emit('logged', false);
+                    }
+                })
+                .catch(error => {
+                    this.isLoading = false;
+                    console.log(error);
+                })
                 this.$emit('successfulEntry', this.entry, this.isActiveLogin, this.isActiveMenu);
                 return; 
             }
@@ -94,4 +129,16 @@
         margin-top: 250px;
     }
 
+    .logo{
+        font-size: 25px;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        padding-top: 35px;
+        padding-left: 30px;
+        height: 90px;
+        width: 100%;
+        padding-bottom: 30px;
+        color: rgb(218, 113, 113);
+        background-color: rgb(138, 83, 83);
+        position: fixed;
+    }
 </style>

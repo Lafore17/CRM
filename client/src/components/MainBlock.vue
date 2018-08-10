@@ -1,27 +1,20 @@
 <template>
   <div>
-    <div class='logo' v-if='isActiveLogo'>
-      <h4>DenisCRM</h4>
-    </div>
+    
     <div class='mainSection'>
       <div class='menu' v-if='isActiveMenu'>
         <ul>
-          <li @click='activeDivision'><router-link to="mainPage" class='link' active-class="active">Главная</router-link></li>
+          <li @click='activeDivision'><router-link to="mainPage" class='link'>Главная</router-link></li>
           <li @click='activeDivision'><router-link to="companies" class='link'>Компании</router-link></li>
           <li @click='activeDivision'><router-link to="events" class='link'>События</router-link></li>
-          <li @click='activeDivision'><a href='#' id='accaunt'  class='link'>Аккаунт</a></li>
+          <li @click='activeDivision'><a href='#' id='accaunt'  class='link acc'>{{currentNameUser}}</a></li>
           <li @click='activeDivision'><router-link to="login" class='link'>Выйти</router-link></li>
         </ul>
       </div>
-        <!-- <div class='section'>
-            <component :is="'login'" 
-            :activeLogin='isActiveLogin' 
-            :activeMenu='isActiveMenu' 
-            @successfulEntry='getMainSection'>
-        </component> -->
-        <!-- </div> -->
     </div>
-    <router-view></router-view>
+    <router-view>
+
+    </router-view>
   </div>
 </template>
 
@@ -32,33 +25,55 @@
       return {
         currentComponent: 'login',
         isActiveMenu: true,
-        isActiveLogin : true,
-        isActiveLogo: false //!!!
+        
+        currentNameUser : ''
       }
     },
-    components:{
-      // login,
-      // Main,
-      // Login
-      // 'main-page' : mainPage,
-      // 'events-page' : eventPage,
-      // 'copmanies-page' : companiesPage,
-      // 'create-event' : createEvent
-    },
-    methods:{
-      getMainSection(entry, activeLogin, activeMenu){
-        this.isActiveLogin = activeLogin;
-        this.isActiveMenu = activeMenu;
-        this.currentComponent = 'main-page';
-        return;
-      },
-      activeDivision(event){
+    methods: {
+      activeDivision(event) {
         let collection = document.getElementsByClassName('link');
         for( let elem of collection ) {
           elem.removeAttribute('style');
         }
         event.target.style.color = 'red';
+        return;
       }
+    },
+    created() {
+      fetch(`http://localhost:3000/api/db/users/${localStorage.getItem('token')}`, {
+        method : 'GET',
+        credentials: 'include'
+      })
+      .then(res => {
+        if(res) {
+          return res.json();
+        }
+      })
+      .then(data => {
+        if(data) {
+          // console.log(data);
+          this.currentNameUser = data.login;
+        }
+      })
+      .catch(error => console.log(error))
+
+      fetch('http://localhost:3000/api/db/events', {
+        method : 'GET',
+        credentials: 'include'
+      })
+      .then(res => {
+        if( res ) {
+          return res.json();
+        }else {
+          return '';
+        }
+      })
+      .then(data => {
+        // this.isLoading = false;
+        // this.$emit('logged', true);
+        console.log(data);
+      })
+      
     }
   }    
 </script>
@@ -135,9 +150,13 @@
     color: white;
   }
 
+  
   /* .menu a:focus {
     background: rgb(209, 174, 184);
     color: red;
   } */
-  
+  .acc{
+    color:blueviolet;
+  }
+
 </style>

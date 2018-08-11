@@ -21,6 +21,7 @@ router.route('/')
         newCompany.creator = req.user.login;
         newCompany.name = data.name;
         newCompany.contact = data.contact;
+        newCompany.email = data.email;
         newCompany.phone = data.phone;
         newCompany.site = data.site;
         newCompany.save(function (err) {

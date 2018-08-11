@@ -1,6 +1,6 @@
 <template>
     <div class='list_of_events'>
-        <datepicker :inline="true" @selected='look'></datepicker>
+        <datepicker :inline="true" @selected='look' :value="state.date"></datepicker>
         <div class='nearlyEventsBlock'>
             <h4>Ближайшие события:</h4>
             <div class='main_page'> 
@@ -23,7 +23,9 @@
     export default {
         data(){
             return{
-
+                state : {
+                    date: new Date()
+                }
             }
         },
         components:{
@@ -32,9 +34,12 @@
         methods:{
             look(value){
                 console.log(value);
+                console.log(this.$store.state.arrayOfEvents)
+                return;
             },
             getCurrentEvent(){
                 this.$router.push('create_event');
+                return;
             }
         }
     }

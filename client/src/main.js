@@ -1,7 +1,7 @@
-import Vue from 'vue'
-import App from './App.vue'
-import VueRouter from 'vue-router'
-
+import Vue from 'vue';
+import App from './App.vue';
+import VueRouter from 'vue-router';
+import store from '../store/index';
 import mainPage from './MainPage';
 import eventPage from './ListOfEvents';
 import companiesPage from './ListOfCompanies';
@@ -36,14 +36,14 @@ const routes = [
           component: eventPage
         },
         {
-          path: 'login',
-          component: Login
-        },
-        {
           path: 'create_event',
           component: createEvent
         }
       ]
+    },
+    {
+      path: '/login',
+      component: Login
     }
 ];
 
@@ -55,5 +55,6 @@ const router = new VueRouter({
 new Vue({
   el: '#app',
   router,
+  store,
   render: h => h(App)
 });

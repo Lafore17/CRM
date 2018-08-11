@@ -1,14 +1,14 @@
 <template>
   <div>
-    
     <div class='mainSection'>
+      <h4 class='waiting' v-if='waiting'>Идет загрузка...</h4>
       <div class='menu' v-if='isActiveMenu'>
         <ul>
           <li @click='activeDivision'><router-link to="mainPage" class='link'>Главная</router-link></li>
           <li @click='activeDivision'><router-link to="companies" class='link'>Компании</router-link></li>
           <li @click='activeDivision'><router-link to="events" class='link'>События</router-link></li>
-          <li @click='activeDivision'><a href='#' id='accaunt'  class='link acc'>{{currentNameUser}}</a></li>
-          <li @click='activeDivision'><router-link to="login" class='link'>Выйти</router-link></li>
+          <li @click='activeDivision'><a href='#' class='link acc'>{{currentNameUser}}</a></li>
+          <li @click='logout'><span class='link'>Выйти</span></li>
         </ul>
       </div>
     </div>
@@ -25,8 +25,9 @@
       return {
         currentComponent: 'login',
         isActiveMenu: true,
-        
-        currentNameUser : ''
+        allInfoOfEvent: '',
+        currentNameUser : '',
+        waiting: true,
       }
     },
     methods: {
@@ -37,9 +38,32 @@
         }
         event.target.style.color = 'red';
         return;
+      },
+      logout() {
+        localStorage.removeItem('token');
+        this.isActiveMenu = false;
+        fetch(`http://localhost:3000/api/logout`, {
+          method : 'GET',
+          credentials: 'include'
+        })
+        .then(res => {
+          if(res) {
+            return res.json();
+          }
+        })
+        .then(data => {
+          if( data.message = 'successfully logout' ) {
+            this.$emit("changeAuthBlock");
+            this.$router.push('/');
+            console.log("successfully logout");
+          }
+        })
+        .catch(error => console.log(error))
+        return;
       }
     },
     created() {
+      this.waiting = true;
       fetch(`http://localhost:3000/api/db/users/${localStorage.getItem('token')}`, {
         method : 'GET',
         credentials: 'include'
@@ -51,29 +75,35 @@
       })
       .then(data => {
         if(data) {
-          // console.log(data);
           this.currentNameUser = data.login;
         }
       })
-      .catch(error => console.log(error))
+    
+      fetch('http://localhost:3000/api/db/events',{
+          method : 'GET',
+          credentials: 'include',
+      })
+      .then(res => res.json())
+      .then(data => {
+          this.$store.dispatch('processingEvents', data); //сортировка ивентов
+      })
 
-      fetch('http://localhost:3000/api/db/events', {
+      fetch('http://localhost:3000/api/db/companies', {
         method : 'GET',
         credentials: 'include'
       })
       .then(res => {
-        if( res ) {
+        if( res ) {      
           return res.json();
         }else {
           return '';
         }
       })
       .then(data => {
-        // this.isLoading = false;
-        // this.$emit('logged', true);
-        console.log(data);
+        this.$store.dispatch("processingGettingCompanies", data);
+        this.waiting = false; 
       })
-      
+      .catch(error => alert(error))
     }
   }    
 </script>
@@ -128,11 +158,11 @@
     padding: 0;
   }
 
-  .menu a {
+  .menu a, span {
     margin: 50px 0 0 0px;
   }
 
-  .menu a {
+  .menu a, span {
     text-decoration: none;
     display: block;  
     font-size: 15px;
@@ -145,18 +175,26 @@
     width: 80px;
   }
 
-  .menu a:hover {
+  .menu a:hover, span:hover {
     background: rgb(209, 174, 184);
     color: white;
   }
 
-  
-  /* .menu a:focus {
-    background: rgb(209, 174, 184);
-    color: red;
-  } */
   .acc{
     color:blueviolet;
   }
 
+  .waiting{
+    display: block;
+    position: fixed; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto;
+    margin-left: 150px;
+    color: coral;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 23px;
+  }
 </style>

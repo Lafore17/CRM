@@ -27,8 +27,7 @@
             <input 
                 type="button" 
                 value='Submit' 
-                class='btn btn-danger' 
-                id='submit'
+                class='btn btn-danger'
                 @click='createEvent'>
             <h3 class='creatingEvent' v-if='creatingEvent'>Создание...</h3>
         </div>
@@ -37,51 +36,89 @@
 
 <script>
     export default {
-        data(){
-            return{
+        data() {
+            return {
                 title: '',
-                type: '',
-                date: '',
-                description: '',
                 status: '',
-                creatingEvent: false,
-                currentEvents: ''
+                type: '',
+                description: '',
+                date: '',
+                creatingEvent: false
             }
         },
-        methods:{
-            createEvent(){
-                this.creatingEvent = true;
-                fetch('http://localhost:3000/api/db/events', {
-                    method : 'POST',
-                    headers:{
-                        'Accept': 'application/json',
-                        'Content-Type' : 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        title: this.title,
-                        type: this.type,
-                        date: this.date,
-                        description: this.description,
-                        status: this.status
-                    }),
-                })
-                .then(() => {
-                    this.creatingEvent = false;
-                    this.title = '';
-                    this.type = '';
-                    this.date = '';
-                    this.description = '';
-                    this.status = '';
-                })
-                // fetch('http://localhost:3000/api/db/events',{
-                //     method : 'GET',
-                //     credentials: 'include',
-                // })
-                // .then(res => res.json())
-                // .then(data => {
-                //     this.array_of_companies = data;  
-                // })
+        methods: {
+            createEvent() {
+                if( this.$store.state.target == 'создать событие' ) {
+                    this.creatingEvent = true;
+                    fetch('http://localhost:3000/api/db/events', {
+                        method : 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type' : 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            title: this.title,
+                            type: this.type,
+                            date: this.date,
+                            description: this.description,
+                            status: this.status,
+                            company: this.$store.state.currentCompany
+                        })
+                    })
+                    .then( () => {
+                        this.creatingEvent = false;
+                        this.title = '';
+                        this.type = '';
+                        this.date = '';
+                        this.description = '';
+                        this.status = '';
+                    })
+                } else if( this.$store.state.target == 'Перейти' ) {
+                    this.creatingEvent = true;
+                    fetch(`http://localhost:3000/api/db/events/${this.$store.state.currentID_of_event}`, {
+                        method : 'PUT',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type' : 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            title: this.title,
+                            type: this.type,
+                            date: this.date,
+                            description: this.description,
+                            status: this.status,
+                            company: this.$store.state.currentCompany
+                        })
+                    })
+                    .then( () => {
+                        this.creatingEvent = false;
+                        this.title = '';
+                        this.type = '';
+                        this.date = '';
+                        this.description = '';
+                        this.status = '';
+                    })
+                } else {
+                    alert(`Пожалуйста, заполните данные поля!`);
+                }
+                
+            }
+        },
+        created() {
+            if( this.$store.state.target == 'Перейти' ) {
+                this.title = this.$store.state.infoBlock.children[0].innerText;
+                this.status = this.$store.state.infoBlock.children[1].innerText;
+                this.type = this.$store.state.infoBlock.children[2].innerText;
+                this.description = this.$store.state.infoBlock.children[3].innerText;
+                this.date = this.$store.state.infoBlock.children[4].innerText;
+            } else {
+                this.title = '';
+                this.status = '';
+                this.type = '';
+                this.description = '';
+                this.date = '';
             }
         }
     }

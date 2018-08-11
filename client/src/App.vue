@@ -2,7 +2,8 @@
   <div id="app" class='wrapper'>
     <router-view 
       @logged='handleLog'
-      :name="isAuth||flag ? 'goodAuth' : 'badAuth'">
+      :name="isAuth||flag ? 'goodAuth' : 'badAuth'" exact
+      @changeAuthBlock='getChangingAuth'>
     </router-view>
   </div>
 </template>
@@ -28,6 +29,10 @@
       },
       getCurrentCompanies(arrayOfCompanies) {
         this.currentCompanies = arrayOfCompanies;
+        return;
+      },
+      getChangingAuth(){
+        this.isAuth = false;
         return;
       }
     },

@@ -28,7 +28,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for='(par, index) in array_of_companies' :key="index">
+                    <tr v-for='(par, index) in $store.state.arrayOfCompanies' :key="index">
                         <td>{{par.name}}</td>
                         <!-- <td>{{par.email}}</td> -->
                         <td>{{par.contact}}</td>
@@ -98,7 +98,7 @@
                 <div class='searcher_with_btn'>
                     <input 
                         type="button" 
-                        value='Cоздать событие' 
+                        value='создать событие' 
                         class='btn btn-danger' 
                         id='addEvents' 
                         @click='create_event'>
@@ -118,15 +118,16 @@
                             <td>Итог</td>
                         </tr>
                     </thead>
-                    <!-- <tbody>
-                        <tr v-for='(pap, index) in papa' :key="index">
-                            <td>{{pap.name}}</td>
-                            <td>{{pap.type}}</td>
-                            <td>{{pap.descr}}</td>
-                            <td>{{pap.date}}</td>
-                            <td>{{pap.conclusion}}</td>
+                    <tbody>
+                        <tr v-for='(event, index) in $store.state.rightArrayEvents' :key="index">
+                            <!-- <td>{{$store.state.rightArrayEvents}}</td> -->
+                            <td>{{event.title}}</td>
+                            <td>{{event.date}}</td>
+                            <td>{{event.description}}</td>
+                            <td>{{event.type}}</td>      
+                            <td>{{event.status}}</td>
                         </tr>
-                    </tbody> -->
+                    </tbody>
                 </table>
                 <div class='pagination_events'>
                     <div class='pagination_events_left'>
@@ -170,7 +171,6 @@
         methods: {
             changePage(){ // pagination argument "page"
                 this.$emit('page-changed', page)
-                // console.log(this.arrayCompanies);
             },
             cancelModal() {
                 if (event.target == document.getElementById('modal')) {
@@ -188,17 +188,20 @@
                 }
                 return;
             },
-            getEvents() {
+            getEvents(event) {
                 this.isActiveModalEvents = true;
+                this.$store.dispatch('processingNameOfCompany', event.target.parentNode.parentNode.children[0].innerText);    //получение нужной компании
+                this.$store.dispatch('processingSearchingEvents');   // нужные ивенты для текущей компании
                 return;
             },
             createCompany() {
                 this.isActiveModal = true;
-                
                 return;
             },
-            create_event() {
+            create_event(event) {
+                this.$store.dispatch('getTarget', event.target.value);
                 this.$router.push('create_event');
+                console.log(this.$store.state.target);
                 return;
             },
             postCompany() {
@@ -222,14 +225,14 @@
                     this.isActiveCreatingCompany = false;
                 })
                 .then(() => {
-                    return fetch('http://localhost:3000/api/db/companies',{
+                    return fetch('http://localhost:3000/api/db/companies', {
                         method : 'GET',
                         credentials: 'include',
                     })
                 })
                 .then(res => res.json())
                 .then(data => {
-                    this.array_of_companies = data;  
+                    this.$store.dispatch("processingGettingCompanies", data); 
                 })
                 .catch(error => console.log(error))
 
@@ -241,29 +244,23 @@
             }
         },
         created(){
-            this.waiting = true;
-            fetch('http://localhost:3000/api/db/companies', {
+            fetch('http://localhost:3000/api/db/events',{
                 method : 'GET',
-                credentials: 'include'
+                credentials: 'include',
             })
-            .then(res => {
-                if( res ) {      
-                    return res.json();
-                }else {
-                    return '';
-                }
-            })
+            .then(res => res.json())
             .then(data => {
-                this.$emit('logged', true);
-                this.waiting = false;
-                this.array_of_companies = data;
-                console.log(this.array_of_companies);
+                this.$store.dispatch('processingEvents', data); //сортировка ивентов
             })
         }
     }
 </script>
 
 <style scoped>
+
+    .loading{
+        margin-bottom: 15px;
+    }
 
     .pagination, .pagination_events{
         width: 100%;

@@ -1,12 +1,9 @@
 <template>
     <div class='wrapper_of_boxInfos'>
-        
         <h1>Ближайшие события:</h1>
         <div class='main_page'> 
-            <h4 class='waiting' v-if='waiting'>
-                Идет загрузка...
-            </h4>
-            <div class='box_of_info' v-for='(elem, index) in array_of_events' :key="index">
+            
+            <div class='box_of_info' v-for='(elem, index) in this.$store.state.arrayOfEvents' :key="index">
                 <h4>{{elem.title}}</h4>
                 <h4>{{elem.status}}</h4>
                 <p>{{elem.type}}</p>
@@ -25,27 +22,28 @@
         data() {
             return {
                 content : '',
-                array_of_events: '',
-                waiting: true
+                block_of_info: ''
             }
         },
         methods: {
             createEvent(event){
-                this.content = event.target.parentNode.parentNode.children[0].children[0].innerText;
-                console.log(this.content)
+                this.block_of_info = event.target.parentNode.parentNode;
+                this.$store.dispatch('getInfoBlock', {
+                    block: this.block_of_info,
+                    target:  event.target.value
+                });
                 this.$router.push('create_event');
             }
         },
-        created() {
-            this.waiting = true;
+        created() { 
             fetch('http://localhost:3000/api/db/events',{
                 method : 'GET',
                 credentials: 'include',
             })
             .then(res => res.json())
             .then(data => {
-                this.array_of_events = data;
-                this.waiting = false;  
+                this.$store.dispatch('processingEvents', data); //сортировка ивентов 
+                 
             })
             .catch(error => alert(error))
         }
@@ -82,18 +80,6 @@
         margin-right: 15px;
     }
 
-    .waiting{
-        display: block;
-        position: fixed; 
-        left: 0;
-        top: 0;
-        width: 100%; 
-        height: 100%; 
-        overflow: auto;
-        margin-left: 150px;
-        color: coral;
-        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-        font-size: 23px;
-    }
+    
 </style>
 

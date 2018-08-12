@@ -52,11 +52,11 @@
                 })
                 .then(res => res.json())
                 .then(data => { 
-                    if(data._id !== undefined){
+                    if(data._id !== undefined) {
                         this.isLoading = false;
                         localStorage.setItem('token', data._id);
                         this.$emit('logged', true);
-                    }else{
+                    } else {
                         alert('error!');
                         this.isLoading = false;
                         this.$emit('logged', false);
@@ -64,7 +64,7 @@
                 })
                 .catch(error => {
                     this.isLoading = false;
-                    console.log(error);
+                    alert(error);
                 })
                 this.$emit('successfulEntry', this.entry, this.isActiveLogin, this.isActiveMenu);
                 return; 

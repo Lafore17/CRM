@@ -37,9 +37,7 @@
                 state : {
                     date: new Date()
                 },
-                highlighted: {
-
-                }
+                highlighted: {}
             }
         },
         components: {
@@ -60,13 +58,6 @@
             }
         },
         created() {
-            // fetch('http://localhost:3000/api/db/events',{
-            //     method : 'GET',
-            //     credentials: 'include',
-            // })
-            // .then(res => res.json())
-            // .then(data => {
-            //     this.$store.dispatch('processingEvents', data); //сортировка ивентов 
             this.highlighted = {
                 arr : this.$store.state.arrayOfEvents,
                 customPredictor(date) {
@@ -78,11 +69,10 @@
                 }
             }
             for( let event of this.$store.state.arrayOfEvents ) {
-                if( event.date.slice(6, 7) == this.state.date.getMonth() + 1 ) {
+                if( event.date.slice(6, 7) == this.state.date.getMonth() + 1 && event.date.slice(0, 4) == this.state.date.getFullYear() ) {
                     this.monthlyEvents.push(event);
                 }
             }
-            console.log(this.$store.state.arrayOfCompanies);
             for( let event of this.monthlyEvents ) {
                 for( let company of this.$store.state.arrayOfCompanies ) {
                     if( event.company === company.name ) {

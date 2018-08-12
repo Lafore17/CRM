@@ -121,13 +121,15 @@
                         @click='create_event'>
                     <input 
                         type="text" 
-                        placeholder='Поиск по дате'
-                        class='searchDate'>
+                        placeholder='Поиск по заголовку'
+                        class='searchDate'
+                        v-model='searchEvent'
+                        @input='getWantedEvents'>
                 </div>
                 <table>
                     <thead>
                         <tr>
-                            <td>Компания</td>
+                            <td>Заголовок</td>
                             <td>Тип</td>
                             <td>Описание</td>
                             <td>Дата</td>
@@ -135,7 +137,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for='(event, index) in $store.state.rightArrayEvents' :key="index">
+                        <tr v-if='!searchEvent' v-for='(event, index) in $store.state.rightArrayEvents' :key="index">
+                            <td>{{event.title}}</td>
+                            <td>{{event.type}}</td>
+                            <td>{{event.description}}</td>
+                            <td>{{event.date}}</td>      
+                            <td>{{event.status}}</td>
+                        </tr>
+                        <tr v-if='searchEvent' v-for='(event, index) in array_of_events' :key="index">
                             <td>{{event.title}}</td>
                             <td>{{event.type}}</td>
                             <td>{{event.description}}</td>
@@ -181,7 +190,9 @@
                 creatingCompany: '',
                 waiting: false,
                 array_of_companies: [],
-                searchContent: ''
+                searchContent: '',
+                searchEvent: '',
+                array_of_events: []
             }
         },
         methods: {
@@ -190,6 +201,15 @@
                 for( let company of this.$store.state.arrayOfCompanies ) {
                     if( this.searchContent === company.name) {
                         this.array_of_companies.push(company);
+                    }
+                }
+                return;
+            },
+            getWantedEvents() {
+                this.array_of_events = [];
+                for( let event of this.$store.state.arrayOfEvents ) {
+                    if( this.searchEvent === event.title) {
+                        this.array_of_events.push(event);
                     }
                 }
                 return;
@@ -239,7 +259,6 @@
             create_event(event) {
                 this.$store.dispatch('getTarget', event.target.value);
                 this.$router.push('create_event');
-                // console.log(this.$store.state.target);
                 return;
             },
             postCompany() {
@@ -268,7 +287,14 @@
                         this.contact_person = '';
                         this.phone = '';
                         this.site = '';
+                        return fetch('http://localhost:3000/api/db/companies', {
+                            method : 'GET',
+                            credentials: 'include',
+                        })
                     })
+                    .then( res => res.json() )
+                    .then( data => this.$store.dispatch("processingGettingCompanies", data))
+                    .catch( error => alert(error) ) 
                 } else {
                     this.isActiveCreatingCompany = true;
                     fetch('http://localhost:3000/api/db/companies', {
@@ -308,16 +334,6 @@
                     this.email = '';
                 }
             }
-        },
-        created(){
-            fetch('http://localhost:3000/api/db/events',{
-                method : 'GET',
-                credentials: 'include',
-            })
-            .then(res => res.json())
-            .then(data => {
-                this.$store.dispatch('processingEvents', data); //сортировка ивентов
-            })
         }
     }
 </script>

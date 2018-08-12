@@ -54,7 +54,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', sans-serif;
         padding-top: 50px;
     }
 
@@ -66,9 +66,10 @@
     }
 
     .box_of_info{
-        border: 1px solid black;
+        border: 1px solid gainsboro;
         margin-left: 15px;
         margin-top: 15px;
+        border-radius: 5px;
     }
 
     .button{
@@ -78,6 +79,10 @@
         margin-right: 15px;
     }
 
-    
+    .box_of_info h4, p, input{
+        margin-left: 10px;
+        margin-top: 5px;
+    }
+
 </style>
 

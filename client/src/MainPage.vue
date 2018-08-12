@@ -1,8 +1,7 @@
 <template>
     <div class='wrapper_of_boxInfos'>
-        <h1>Ближайшие события:</h1>
+        <h1>События:</h1>
         <div class='main_page'> 
-            
             <div class='box_of_info' v-for='(elem, index) in this.$store.state.arrayOfEvents' :key="index">
                 <h4>{{elem.title}}</h4>
                 <h4>{{elem.status}}</h4>
@@ -35,15 +34,14 @@
                 this.$router.push('create_event');
             }
         },
-        created() { 
+        created() {
             fetch('http://localhost:3000/api/db/events',{
                 method : 'GET',
                 credentials: 'include',
             })
             .then(res => res.json())
             .then(data => {
-                this.$store.dispatch('processingEvents', data); //сортировка ивентов 
-                 
+                this.$store.dispatch('processingEvents', data); //сортировка ивентов  
             })
             .catch(error => alert(error))
         }

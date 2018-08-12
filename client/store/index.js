@@ -7,12 +7,13 @@ export default new Vuex.Store({
     state:{
         target: '',
         infoBlock: '',
-        arrayOfEvents: '',
         currentCompany: '',
+        arrayOfEvents: '',
         rightArrayEvents: [],
+        arrayOfCompanies: '',
         eventID: '',
         currentID_of_event: '',
-        arrayOfCompanies: ''
+        currentID_of_companies: ''
     },
     mutations:{
         getTarget(state, target) {
@@ -56,6 +57,15 @@ export default new Vuex.Store({
         getCompanies(state, companies){
             state.arrayOfCompanies = companies;
             return;
+        },
+        getID_of_company(state, data){
+            let nameCompany = data.children[0].innerText;
+            for( let company of state.arrayOfCompanies ) {
+                if( company.name === nameCompany ) {
+                    state.currentID_of_companies = company._id;
+                }
+            }
+            return;
         }
     },
     actions:{
@@ -83,6 +93,10 @@ export default new Vuex.Store({
         },
         processingGettingCompanies({commit}, companies){
             commit("getCompanies", companies);
+            return;
+        },
+        processingFindingId({commit}, obj){
+            commit('getID_of_company', obj);
             return;
         }
     }

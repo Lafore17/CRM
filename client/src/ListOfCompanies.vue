@@ -13,10 +13,11 @@
                     <input 
                         type="text" 
                         placeholder="Поиск по названию" 
-                        class='form-control'>
+                        class='form-control'
+                        v-model='searchContent'
+                        @input='getWantedContent'>
                 </form>
             </div>
-            
             <table>
                 <thead>
                     <tr>
@@ -27,10 +28,10 @@
                         <td>Сайт</td>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr v-for='(par, index) in $store.state.arrayOfCompanies' :key="index">
+                <tbody>  
+                    <tr v-if='!searchContent' v-for='(par, index) in $store.state.arrayOfCompanies' :key="index">
                         <td>{{par.name}}</td>
-                        <!-- <td>{{par.email}}</td> -->
+                        <td>{{par.email}}</td>
                         <td>{{par.contact}}</td>
                         <td>{{par.phone}}</td>
                         <td>{{par.site}}</td>
@@ -38,14 +39,31 @@
                             <input 
                                 type="button" 
                                 value="events" 
-                                class='events btn btn-outline-info' 
-                                id='events' 
+                                class='events btn btn-outline-info'
                                 @click='getEvents'>
                             <input 
                                 type="button" 
                                 value="upd" 
                                 class='upd btn btn-outline-info' 
-                                :id='par.name' 
+                                @click='updateCompany'>
+                        </div>
+                    </tr>
+                    <tr v-if='searchContent' v-for='(par, index) in array_of_companies' :key="index">
+                        <td>{{par.name}}</td>
+                        <td>{{par.email}}</td>
+                        <td>{{par.contact}}</td>
+                        <td>{{par.phone}}</td>
+                        <td>{{par.site}}</td>
+                        <div class='btns'>
+                            <input 
+                                type="button" 
+                                value="events" 
+                                class='events btn btn-outline-info'
+                                @click='getEvents'>
+                            <input 
+                                type="button" 
+                                value="upd" 
+                                class='upd btn btn-outline-info' 
                                 @click='updateCompany'>
                         </div>
                     </tr>
@@ -64,7 +82,7 @@
             <div class='content_of_modal'>
                 <span class="close" @click='isActiveModal = false'>&times;</span>
                 <h4>Компания:</h4>
-                <form>
+                <form class='formBlock'>
                     <div>
                         <label for="title_of_company">Name of Company</label>
                         <input type="text" id='title_of_company' v-model='name_of_company'>
@@ -99,13 +117,11 @@
                     <input 
                         type="button" 
                         value='создать событие' 
-                        class='btn btn-danger' 
-                        id='addEvents' 
+                        class='btn btn-danger width' 
                         @click='create_event'>
                     <input 
                         type="text" 
-                        placeholder='Поиск по дате' 
-                        id='search_with_date' 
+                        placeholder='Поиск по дате'
                         class='searchDate'>
                 </div>
                 <table>
@@ -120,11 +136,10 @@
                     </thead>
                     <tbody>
                         <tr v-for='(event, index) in $store.state.rightArrayEvents' :key="index">
-                            <!-- <td>{{$store.state.rightArrayEvents}}</td> -->
                             <td>{{event.title}}</td>
-                            <td>{{event.date}}</td>
+                            <td>{{event.type}}</td>
                             <td>{{event.description}}</td>
-                            <td>{{event.type}}</td>      
+                            <td>{{event.date}}</td>      
                             <td>{{event.status}}</td>
                         </tr>
                     </tbody>
@@ -165,12 +180,23 @@
                 isActiveCreatingCompany: false,
                 creatingCompany: '',
                 waiting: false,
-                array_of_companies: ''
+                array_of_companies: [],
+                searchContent: ''
             }
         },
         methods: {
-            changePage(){ // pagination argument "page"
-                this.$emit('page-changed', page)
+            getWantedContent() {
+                this.array_of_companies = [];
+                for( let company of this.$store.state.arrayOfCompanies ) {
+                    if( this.searchContent === company.name) {
+                        this.array_of_companies.push(company);
+                    }
+                }
+                return;
+            },
+            changePage() { // pagination argument "page"
+                this.$emit('page-changed', page);
+                return;
             },
             cancelModal() {
                 if (event.target == document.getElementById('modal')) {
@@ -178,8 +204,15 @@
                 }
                 return;
             },
-            updateCompany() {
+            updateCompany(event) {
+                this.$store.dispatch('getTarget', event.target.value);
                 this.isActiveModal = true;
+                this.$store.dispatch('processingFindingId', event.target.parentNode.parentNode);
+                this.name_of_company = event.target.parentNode.parentNode.children[0].innerText;
+                this.email = event.target.parentNode.parentNode.children[1].innerText;
+                this.contact_person = event.target.parentNode.parentNode.children[2].innerText;
+                this.phone = event.target.parentNode.parentNode.children[3].innerText;
+                this.site = event.target.parentNode.parentNode.children[4].innerText;
                 return;
             },
             cancelModalEvents() {
@@ -196,51 +229,84 @@
             },
             createCompany() {
                 this.isActiveModal = true;
+                this.name_of_company = '';
+                this.email = '';
+                this.contact_person = '';
+                this.phone = '';
+                this.site = '';
                 return;
             },
             create_event(event) {
                 this.$store.dispatch('getTarget', event.target.value);
                 this.$router.push('create_event');
-                console.log(this.$store.state.target);
+                // console.log(this.$store.state.target);
                 return;
             },
             postCompany() {
-                this.isActiveCreatingCompany = true;
-                fetch('http://localhost:3000/api/db/companies', {
-                    method : 'POST',
-                    headers:{
-                        'Accept': 'application/json',
-                        'Content-Type' : 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        name: this.name_of_company,
-                        contact: this.contact_person,
-                        phone: this.phone,
-                        site: this.site
-                        //email
-                    }),
-                })
-                .then(() => {
-                    this.isActiveCreatingCompany = false;
-                })
-                .then(() => {
-                    return fetch('http://localhost:3000/api/db/companies', {
-                        method : 'GET',
+                if( this.$store.state.target == 'upd' ) {
+                    this.isActiveCreatingCompany = true;
+                    fetch(`http://localhost:3000/api/db/companies/${this.$store.state.currentID_of_companies}`, {
+                        method : 'PUT',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type' : 'application/json'
+                        },
                         credentials: 'include',
+                        body: JSON.stringify({
+                            name: this.name_of_company,
+                            email: this.email,
+                            contact: this.contact_person,
+                            phone: this.phone,
+                            site: this.site
+                        })
                     })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    this.$store.dispatch("processingGettingCompanies", data); 
-                })
-                .catch(error => console.log(error))
+                    .then( () => {
+                        this.isActiveCreatingCompany = false;
+                        this.creatingEvent = false;
+                        this.name_of_company = '';
+                        this.email = '';
+                        this.contact_person = '';
+                        this.phone = '';
+                        this.site = '';
+                    })
+                } else {
+                    this.isActiveCreatingCompany = true;
+                    fetch('http://localhost:3000/api/db/companies', {
+                        method : 'POST',
+                        headers:{
+                            'Accept': 'application/json',
+                            'Content-Type' : 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            name: this.name_of_company,
+                            contact: this.contact_person,
+                            phone: this.phone,
+                            site: this.site,
+                            email: this.email
+                        }),
+                    })
+                    .then(() => {
+                        this.isActiveCreatingCompany = false;
+                    })
+                    .then(() => {
+                        return fetch('http://localhost:3000/api/db/companies', {
+                            method : 'GET',
+                            credentials: 'include',
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.$store.dispatch("processingGettingCompanies", data); 
+                    })
+                    .catch(error => console.log(error))
 
-                this.name_of_company = '';
-                this.contact_person = '';
-                this.phone = '';
-                this.site = '';
-                this.email = '';
+                    this.name_of_company = '';
+                    this.contact_person = '';
+                    this.phone = '';
+                    this.site = '';
+                    this.email = '';
+                }
             }
         },
         created(){
@@ -258,11 +324,19 @@
 
 <style scoped>
 
-    .loading{
+    .formBlock input{
+        margin-right: 200px;
+    }
+
+    .formBlock label{
+        margin-left: 200px;
+    }
+
+    .loading {
         margin-bottom: 15px;
     }
 
-    .pagination, .pagination_events{
+    .pagination, .pagination_events {
         width: 100%;
         height: 44px;
         display: flex;
@@ -274,7 +348,7 @@
         width: 20%;
     }
     
-    .pagination a, .pagination_events a{
+    .pagination a, .pagination_events a {
         display: block;
         text-align: center;
         font-family: Arial, Helvetica, sans-serif;
@@ -292,45 +366,33 @@
         transition: all .2s ease-in-out;
     }
 
-    .pagination a:hover, .pagination_events a:hover{
+    .pagination a:hover, .pagination_events a:hover {
         border-color: #ea4c89;
         color: #ea4c89;
     }
 
-    .table_of_companies{
-        margin-left: 250px;
+    .table_of_companies {
+        margin-left: 300px;
         font-size: 16px;
         font-family: Arial, Helvetica, sans-serif;
-        width: 70%;
+        width: 1200px;
         padding-top: 50px;
     }
 
-    table{
-        border-collapse: separate;
-        border-spacing: 0px 25px; 
-    }
-
-    .events, .upd{
+    .events, .upd {
         margin-left: 7px;
     }
 
-    .btns{
+    .btns {
         display: flex;
         flex-direction: row;
     }
 
-    td{
-        border:1px solid black;
-        width: 180px;
-        height: 10px;
-        text-align: center;
-    }
-
-    .button_with_searcher{
+    .button_with_searcher {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        width: 83.5%;
+        width: 76%;
     }
 
     .modal, .events_modal {
@@ -346,13 +408,16 @@
         background-color: rgba(0,0,0,0.4); 
     }
 
-    .content_of_modal, .content_of_modal_events{
+    .content_of_modal, .content_of_modal_events {
         background-color: #fefefe;
         margin: 10% auto; 
         padding: 20px;
         border: 1px solid #888;
         width: 70%; 
         box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .close {
@@ -360,71 +425,125 @@
         float: right;
         font-size: 28px;
         font-weight: bold;
+        display: flex;
+        justify-content: flex-end;
     }
 
-    .close:hover,
-    .close:focus {
+    .close:hover, .close:focus {
         color: black;
         text-decoration: none;
         cursor: pointer;
     }
 
-    .content_of_modal h4, .content_of_modal_events h4{
+    .content_of_modal h4, .content_of_modal_events h4 {
         text-align: center;
     }
 
-    .content_of_modal form, .content_of_modal_events form{
+    .content_of_modal form, .content_of_modal_events form {
         display: flex;
         flex-direction: column;
+        justify-content: space-around;
     }
 
-    .content_of_modal form div, .content_of_modal_events form div{
+    .content_of_modal form div, .content_of_modal_events form div {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         margin-top: 15px;
     }
 
-    .content_of_modal input, .content_of_modal_events input{
-        margin-right: 80px;
-        width: 350px;
+    .content_of_modal input, .content_of_modal_events input {
+        /* margin-right: 80px; */
+        margin-top: 5px;
+        width: 200px;
     }
 
-    #submit{
+    #submit {
         width: 100px;
         text-align: center;
     }
 
-    #addEvents{
+    #addEvents {
         width: 150px;
         text-align: center;
     }
 
-    .submit_info_of_company{
+    .submit_info_of_company {
         display: flex;
         justify-content: center;
         margin-top: 35px;
     }
 
-    label{
-        font-size: 18px;
-        margin-left: 100px;
+    label {
+        font-size: 17px;
+        margin-left: 90px;
     }
 
-    #search_with_date{
+    #search_with_date {
         width: 200px;
     }
 
-    .searcher_with_btn{
+    .searcher_with_btn {
         display: flex;
         justify-content: space-between;
         flex-direction: row;
+        margin-top: 5px;
     }
 
-    .waitingTitle{
+    .waitingTitle {
         padding-left: 150px;
         color: coral;
         font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    }
+
+    table {
+        font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+        font-size: 14px;
+        border-radius: 10px;
+        border-spacing: 0;
+        text-align: center;
+        margin-top: 25px;
+    }
+
+    th {
+        background: #BCEBDD;
+        color: white;
+        text-shadow: 0 1px 1px #2D2020;
+        padding: 10px 20px;
+    }
+
+    th, td {
+        border-style: solid;
+        border-width: 0 1px 1px 0;
+        border-color: white;
+        width: 250px;
+    }
+
+    th:first-child, td:first-child {
+        text-align: left;
+    }
+    
+    th:first-child {
+        border-top-left-radius: 10px;
+    }
+
+    th:last-child {
+        border-top-right-radius: 10px;
+        border-right: none;
+    }
+
+    td {
+        padding: 10px 20px;
+        background: #F8E391;
+        width: 185px;
+    }
+
+    tr td:last-child {
+        border-right: none;
+    }
+
+    thead td{
+        background-color: rgb(221, 188, 188);
     }
 
 </style>

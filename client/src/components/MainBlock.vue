@@ -12,7 +12,7 @@
         </ul>
       </div>
     </div>
-    <router-view>
+    <router-view v-if='this.$store.state.arrayOfEvents && this.$store.state.arrayOfCompanies'>
 
     </router-view>
   </div>
@@ -52,11 +52,12 @@
           }
         })
         .then(data => {
-          if( data.message = 'successfully logout' ) {
+          if( data.message == 'successfully logout' ) {
             this.$emit("changeAuthBlock");
-            this.$router.push('/');
-            console.log("successfully logout");
           }
+        })
+        .then( () => {
+          this.$router.push('/');
         })
         .catch(error => console.log(error))
         return;
@@ -78,16 +79,16 @@
           this.currentNameUser = data.login;
         }
       })
-    
-      fetch('http://localhost:3000/api/db/events',{
-          method : 'GET',
-          credentials: 'include',
+      .then(() => {
+        return  fetch('http://localhost:3000/api/db/events', {
+            method : 'GET',
+            credentials: 'include',
+        })
       })
       .then(res => res.json())
       .then(data => {
           this.$store.dispatch('processingEvents', data); //сортировка ивентов
       })
-
       fetch('http://localhost:3000/api/db/companies', {
         method : 'GET',
         credentials: 'include'
@@ -95,7 +96,7 @@
       .then(res => {
         if( res ) {      
           return res.json();
-        }else {
+        } else {
           return '';
         }
       })

@@ -40,10 +40,6 @@ const routes = [
           component: createEvent
         }
       ]
-    },
-    {
-      path: '/login',
-      component: Login
     }
 ];
 

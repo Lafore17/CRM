@@ -14,8 +14,7 @@
                         type="text" 
                         placeholder="Поиск по названию" 
                         class='form-control'
-                        v-model='searchContent'
-                        @input='getWantedContent'>
+                        v-model='searchContent'>
                 </form>
             </div>
             <table>
@@ -29,26 +28,7 @@
                     </tr>
                 </thead>
                 <tbody>  
-                    <tr v-if='!searchContent' v-for='(par, index) in $store.state.arrayOfCompanies' :key="index">
-                        <td>{{par.name}}</td>
-                        <td>{{par.email}}</td>
-                        <td>{{par.contact}}</td>
-                        <td>{{par.phone}}</td>
-                        <td>{{par.site}}</td>
-                        <div class='btns'>
-                            <input 
-                                type="button" 
-                                value="events" 
-                                class='events btn btn-outline-info'
-                                @click='getEvents'>
-                            <input 
-                                type="button" 
-                                value="upd" 
-                                class='upd btn btn-outline-info' 
-                                @click='updateCompany'>
-                        </div>
-                    </tr>
-                    <tr v-if='searchContent' v-for='(par, index) in array_of_companies' :key="index">
+                    <tr v-for='(par, index) in arr' :key="index">
                         <td>{{par.name}}</td>
                         <td>{{par.email}}</td>
                         <td>{{par.contact}}</td>
@@ -175,6 +155,9 @@
             },
             prevPage() {
                 return this.current - 1;        
+            },
+            arr() {
+                return this.$store.state.arrayOfCompanies.filter(company => company.name.startsWith(this.searchContent) )
             }
         },
         data() {
@@ -189,22 +172,12 @@
                 isActiveCreatingCompany: false,
                 creatingCompany: '',
                 waiting: false,
-                array_of_companies: [],
                 searchContent: '',
                 searchEvent: '',
                 array_of_events: []
             }
         },
         methods: {
-            getWantedContent() {
-                this.array_of_companies = [];
-                for( let company of this.$store.state.arrayOfCompanies ) {
-                    if( this.searchContent === company.name) {
-                        this.array_of_companies.push(company);
-                    }
-                }
-                return;
-            },
             getWantedEvents() {
                 this.array_of_events = [];
                 for( let event of this.$store.state.arrayOfEvents ) {

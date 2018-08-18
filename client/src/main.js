@@ -8,8 +8,10 @@ import companiesPage from './ListOfCompanies';
 import Login from './components/Login';
 import MainBlock from './components/MainBlock';
 import createEvent from './addEvent';
+import Vuelidate from 'vuelidate';
 
 Vue.use(VueRouter);
+Vue.use(Vuelidate);
 
 const routes = [
     {

@@ -6,11 +6,11 @@
         <form action=''>
             <div class='login'>
                 <label for="login">Login</label>
-                <input type="text" id='login' v-model='login' class='form-control' name='login'>
+                <input type="text" id='login' v-model='$v.login.$model' class='form-control' name='login' :class='{error: !($v.login.required && $v.login.minLength)}'>
             </div>
             <div class='password'>
                 <label for="password">Password</label>
-                <input type="password" id='password' v-model='password' class='form-control' name='password'>
+                <input type="password" id='password' v-model='$v.password.$model' class='form-control' name='password' :class='{error: !($v.password.required && $v.password.minLength)}'>
             </div>
         </form>
         <div class='loading' v-if='isLoading'>
@@ -20,7 +20,8 @@
     </div>
 </template>
 <script>
-    import axios from 'axios';
+    import Axios from 'axios';
+    import { required, minLength } from 'vuelidate/lib/validators';
     export default {
         props:['activeLogin', 'activeMenu'],
         data() {
@@ -37,43 +38,62 @@
         },
         methods: {
             submitUser() {
-                this.isLoading = true;
-                fetch('http://localhost:3000/api/login', {
-                    method : 'POST',
-                    headers:{
-                        'Accept': 'application/json',
-                        'Content-Type' : 'application/json'
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        login: this.login,
-                        password: this.password
+                if( !this.$v.login.$invalid, !this.$v.password.$invalid ) {
+                    this.isLoading = true;
+                    fetch('http://localhost:3000/api/login', {
+                        method : 'POST',
+                        headers:{
+                            'Accept': 'application/json',
+                            'Content-Type' : 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            login: this.login,
+                            password: this.password
+                        })
                     })
-                })
-                .then(res => res.json())
-                .then(data => { 
-                    if(data._id !== undefined) {
+                    .then(res => res.json())
+                    .then(data => { 
+                        if(data._id !== undefined) {
+                            this.isLoading = false;
+                            localStorage.setItem('token', data._id);
+                            this.$emit('logged', true);
+                        } else {
+                            alert('error!');
+                            this.isLoading = false;
+                            this.$emit('logged', false);
+                        }
+                    })
+                    .catch(error => {
                         this.isLoading = false;
-                        localStorage.setItem('token', data._id);
-                        this.$emit('logged', true);
-                    } else {
-                        alert('error!');
-                        this.isLoading = false;
-                        this.$emit('logged', false);
-                    }
-                })
-                .catch(error => {
-                    this.isLoading = false;
-                    alert(error);
-                })
-                this.$emit('successfulEntry', this.entry, this.isActiveLogin, this.isActiveMenu);
-                return; 
+                        alert(error);
+                    })
+                    this.$emit('successfulEntry', this.entry, this.isActiveLogin, this.isActiveMenu);
+                    return;
+                } else {
+                    alert('Введите корректные данные!');
+                    return;
+                }
+            }
+        },
+        validations: {
+            login: {
+                required,
+                minLength: minLength(4)
+            },
+            password: {
+                required,
+                minLength: minLength(6)
             }
         }
     }
 </script>
 
 <style scoped>
+
+    .error{
+        border: 1px solid red;
+    }
 
     form{ 
         display: flex;
